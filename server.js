@@ -1,10 +1,27 @@
-const express = require('express');
+const express = require("express");
 const app = express();
+const { Deck, Hand } = require("./public/deck");
+const cors = require("cors");
 
-// Responder styles, script
-app.use('/', express.static(`${__dirname}/public`))
-
-app.listen(4001, () => {
-  console.log('Server running on port 4001');
+app.use(express.static("public"));
+app.use(express.json());
+app.use(cors());
+const deck = new Deck();
+let table = deck.dispatchCards(5);
+app.get("/table", (req, res) => {
+  console.log(table);
+  res.json(table);
 });
 
+app.get("/getDeck", (req, res) => {
+  const hands = [];
+  hands.push(new Hand(deck, +2));
+  return res.json({
+    hands: hands.map((hand) => hand.cards),
+    deck: table.cards,
+  });
+});
+
+app.listen(4001, () => {
+  console.log("Server running on port 4001");
+});
